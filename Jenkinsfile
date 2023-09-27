@@ -8,8 +8,9 @@ pipeline {
                 
                 checkout([$class: 'GitSCM', 
                           branches: [[name: 'master']], 
-                          userRemoteConfigs: [[url: 'https://github.com/jabedhasan21/java-hello-world-with-maven.git']]])
+                          userRemoteConfigs: [[url: 'https://github.com/Krishnateja5056/java-hello-world-with-maven.git']]])
                 stash includes: '*', name: 'app'
+                stash includes: 'Dockerfile', name: 'dockerfile'
             }
         }
         stage('Build') {
@@ -30,7 +31,8 @@ pipeline {
                 }
             }
         }
-        stage('Uploading artifacts') {
+
+        stage('UploadingArtifactsToS3') {
 
             agent {
                 label 'aws'
@@ -47,16 +49,44 @@ pipeline {
                 
                  {
                     unstash 'artifact'
-                    sh '''  cd target
-                            ls
-                            pwd
-                            aws s3 ls '''
-                    sh 'aws s3 cp target/ s3://krishna-test-artifacts/spb-jar-files/ --recursive --include "*.jar"'
+                    sh 'aws s3api put-object --bucket krishnat-test-artifacts --key spb-jar-files/$BUILD_NUMBER/ --content-length 0'
+                    sh 'aws s3 cp target/ s3://krishnat-test-artifacts/spb-jar-files/$BUILD_NUMBER --recursive --include "*.jar"'
                 }
+                
+            }
+
+        }
+        stage('BuildImageAndPushToECR') {
+
+            agent {
+                label 'docker-agent'
+            }
+
+            steps {
+
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]])
+                
+                 {
+                    unstash 'artifact'
+                    unstash 'dockerfile'
+                    sh '''aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 580741598336.dkr.ecr.us-east-1.amazonaws.com
+                            docker build -t test .
+                            docker tag test:latest 580741598336.dkr.ecr.us-east-1.amazonaws.com/test:latest.$BUILD_NUMBER
+                            docker push 580741598336.dkr.ecr.us-east-1.amazonaws.com/test:latest.$BUILD_NUMBER'''
+    
                 
             }
 
 
         }
+
     }
+
+}
+        
 }
