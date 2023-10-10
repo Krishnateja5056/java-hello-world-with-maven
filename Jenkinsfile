@@ -11,7 +11,6 @@ pipeline {
                 label 'maven'
             }
             steps {
-                unstash 'app'
                 sh 'mvn clean package'
                 stash includes: '**/target/*.jar', name: 'artifact'
             }
