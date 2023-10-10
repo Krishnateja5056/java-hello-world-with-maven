@@ -13,4 +13,4 @@ phases:
       - echo "Post-build phase"
 
 artifacts:
-  files: '**/*'
+  files: '**/target/*.jar'
