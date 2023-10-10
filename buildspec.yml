@@ -7,7 +7,7 @@ phases:
   build:
     commands:
       - echo "Build phase"
-      - docker run -v $CODEBUILD_SRC_DIR:/app krishna8750/test:maven mvn clean package
+      - docker run -v $CODEBUILD_SRC_DIR:/app maven:latest mvn clean package
   post_build:
     commands:
       - echo "Post-build phase"
