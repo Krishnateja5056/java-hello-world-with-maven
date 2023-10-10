@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "Pre-build phase"
+  build:
+    commands:
+      - echo "Build phase"
+      - docker run -v $CODEBUILD_SRC_DIR:/app krishna8750/test:maven mvn clean package
+  post_build:
+    commands:
+      - echo "Post-build phase"
+
+artifacts:
+  files: '**/*'
