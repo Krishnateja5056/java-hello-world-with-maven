@@ -45,8 +45,8 @@ pipeline {
                     ]
                 ]) {
                     unstash 'artifact'
-                    sh 'aws s3api put-object --bucket artifacts-s3-mvn-jarfiles --key spb-jar-files/$BUILD_NUMBER/ --content-length 0'
-                    sh 'aws s3 cp target/ s3://artifacts-s3-mvn-jarfiles/spb-jar-files/$BUILD_NUMBER --recursive --include "*.jar"'
+                    sh 'aws s3api put-object --bucket artifacts-jenkins-test-jar --key spb-jar-files/$BUILD_NUMBER/ --content-length 0'
+                    sh 'aws s3 cp target/ s3://artifacts-jenkins-test-jar/spb-jar-files/$BUILD_NUMBER --recursive --include "*.jar"'
                 }
             }
         }
