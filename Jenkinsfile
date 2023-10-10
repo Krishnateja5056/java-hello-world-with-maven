@@ -59,7 +59,7 @@ pipeline {
                 label 'ecs'
             }
             steps {
-                echo "Building the Docker Imaage"
+                echo "Building the Docker Image"
             }
         }
     }
