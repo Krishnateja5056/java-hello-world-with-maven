@@ -5,5 +5,4 @@ env:
 phases:
   pre_build:
     commands:
-      - 'docker login -u $dockerHubUsername -p $dockerHubPassword'
       - ls
