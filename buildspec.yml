@@ -1,13 +1,10 @@
 version: 0.2
-
+env:
+  secrets-manager:
+    dockerHubUsername: dockerhub-login:krishna8750
+    dockerHubPassword: dockerhub-login:Krishnateja8750!
 phases:
   pre_build:
     commands:
-      - echo "Pre-build phase"
-  build:
-    commands:
-      - echo "Build phase"
+      - 'docker login -u $dockerHubUsername -p $dockerHubPassword'
       - ls
-  post_build:
-    commands:
-      - echo "Post-build phase"
