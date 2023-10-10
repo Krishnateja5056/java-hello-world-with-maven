@@ -6,15 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout([$class: 'GitSCM', 
-                          branches: [[name: 'master']], 
-                          userRemoteConfigs: [[url: 'https://github.com/Krishnateja5056/java-hello-world-with-maven.git']]])
-                stash includes: '*', name: 'app'
-            }
-        }
-
         stage('Build') {
             agent {
                 label 'maven'
