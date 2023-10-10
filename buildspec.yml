@@ -1,6 +1,6 @@
 version: 0.2
 env:
-  dockerHubUsername: krishna8750
+  dockerHubUsername: krishnateja.tandrapati@gmail.com
   dockerHubPassword: Krishnateja8750!
 phases:
   pre_build:
