@@ -1,8 +1,7 @@
 version: 0.2
 env:
-  secrets-manager:
-    dockerHubUsername: dockerhub-login:krishna8750
-    dockerHubPassword: dockerhub-login:Krishnateja8750!
+  dockerHubUsername: krishna8750
+  dockerHubPassword: Krishnateja8750!
 phases:
   pre_build:
     commands:
