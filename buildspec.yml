@@ -1,8 +1,8 @@
 version: 0.2
-env:
-  dockerHubUsername: krishnateja.tandrapati@gmail.com
-  dockerHubPassword: Krishnateja8750!
 phases:
   pre_build:
     commands:
       - ls
+  build:
+    commands:
+      - mvn clean package
