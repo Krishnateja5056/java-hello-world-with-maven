@@ -1,55 +1,78 @@
 pipeline {
     agent any
 
-    parameters {
-        choice(name: 'BuildImage', choices: ['Yes', 'No'], description: 'Do you want to build the docker image?')
-    }
-
     stages {
-        stage('Build') {
-            agent {
-                label 'maven'
-            }
-            steps {
-                sh 'mvn clean package'
-                stash includes: '**/target/*.jar', name: 'artifact'
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
-                }
-            }
-        }
-
-        stage('Uploading artifacts') {
+        stage('PreBuild') {
             agent {
                 label 'aws'
             }
+
             steps {
-                withCredentials([
-                    [
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'aws-creds',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                    ]
-                ]) {
-                    unstash 'artifact'
-                    sh 'aws s3api put-object --bucket artifacts-jenkins-test-jar --key spb-jar-files/$BUILD_NUMBER/ --content-length 0'
-                    sh 'aws s3 cp target/ s3://artifacts-jenkins-test-jar/spb-jar-files/$BUILD_NUMBER --recursive --include "*.jar"'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]])
+                {
+                    sh 'aws ssm put-parameter --name BUILD_NUMBER --value $BUILD_NUMBER --type String --overwrite'
                 }
             }
         }
+        stage('Build') {
 
-        stage('Build Image') {
-            when {
-                expression { params.BuildImage == 'Yes' }
-            }
             agent {
-                label 'ecs'
-            }
+                label 'maven'
+              }
+
             steps {
-                echo "Building the Docker Image"
+                unstash 'app'
+                sh 'mvn clean package'
+			    stash includes: '**/target/*.jar', name: 'artifact'
+            }
+            
+            post {
+                always {
+                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                }
+            }
+        }
+        stage('Uploading artifacts') {
+
+            agent {
+                label 'aws'
+            }
+
+            steps {
+
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]])
+                
+                 {
+                    unstash 'artifact'
+                    sh 'aws s3api put-object --bucket test-jar-artifacts --key spb-jar-files/$BUILD_NUMBER/ --content-length 0'
+                    sh 'aws s3 cp target/ s3://test-jar-artifacts/spb-jar-files/$BUILD_NUMBER --recursive --include "*.jar"'
+                    sh 'aws s3 cp Dockerfile s3://test-jar-artifacts/spb-jar-files/$BUILD_NUMBER/'
+                }
+                
+            }
+
+
+        }
+        
+        stage('Approve BuildImage') {
+            steps {
+                input message: 'Do you want to build the image?', ok: 'Yes'
+            }
+        }
+        
+        stage('Build Image on AWS CodeBuild') {
+            steps {
+                awsCodeBuild credentialsId: 'code-creds', credentialsType: 'jenkins', projectName: 'docker', region: 'us-east-1', sourceControlType: 'project'
             }
         }
     }
