@@ -26,9 +26,8 @@ pipeline {
               }
 
             steps {
-                unstash 'app'
                 sh 'mvn clean package'
-			    stash includes: '**/target/*.jar', name: 'artifact'
+	        stash includes: '**/target/*.jar', name: 'artifact'
             }
             
             post {
