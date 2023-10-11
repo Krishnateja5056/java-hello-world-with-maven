@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM public.ecr.aws/x6e3i3q9/app:java
 VOLUME /tmp
 ARG JAR_FILE=target/*.jar
 COPY $JAR_FILE app.jar
