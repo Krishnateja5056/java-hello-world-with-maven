@@ -53,9 +53,9 @@ pipeline {
                 
                  {
                     unstash 'artifact'
-                    sh 'aws s3api put-object --bucket test-jar-artifacts --key spb-jar-files/$BUILD_NUMBER/ --content-length 0'
-                    sh 'aws s3 cp target/ s3://test-jar-artifacts/spb-jar-files/$BUILD_NUMBER --recursive --include "*.jar"'
-                    sh 'aws s3 cp Dockerfile s3://test-jar-artifacts/spb-jar-files/$BUILD_NUMBER/'
+                    sh 'aws s3api put-object --bucket artifacts-jar-test --key spb-jar-files/$BUILD_NUMBER/ --content-length 0'
+                    sh 'aws s3 cp target/ s3://artifacts-jar-test/spb-jar-files/$BUILD_NUMBER --recursive --include "*.jar"'
+                    sh 'aws s3 cp Dockerfile s3://artifacts-jar-test/spb-jar-files/$BUILD_NUMBER/'
                 }
                 
             }
