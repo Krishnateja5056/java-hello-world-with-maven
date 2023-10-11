@@ -1,4 +1,4 @@
-FROM public.ecr.aws/x6e3i3q9/app:java
+FROM public.ecr.aws/x5l4h1c0/app:java
 VOLUME /tmp
 ARG JAR_FILE=*.jar
 COPY $JAR_FILE app.jar
