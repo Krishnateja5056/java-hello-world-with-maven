@@ -3,6 +3,7 @@ pipeline {
 	stages {
 		stage ('SCM') {
 			steps {
+				cleanWs()
 				echo 'checkout SCM'
 				}
 			}
