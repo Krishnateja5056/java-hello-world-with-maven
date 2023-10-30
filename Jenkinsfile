@@ -11,7 +11,7 @@ pipeline {
 				label 'maven'
 				}
 			steps {
-				withSonarQubeEnv('sonarserver) {
+				withSonarQubeEnv('sonarserver') {
 					sh "mvn clean verify sonar:sonar -Dsonar.projectKey=maven"
 					}
 				}
